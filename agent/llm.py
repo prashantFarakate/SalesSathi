@@ -97,6 +97,28 @@ def _heuristic_score(lead: dict, in_stock: bool) -> dict:
     return {"score": score, "tier": tier, "reasons": reasons}
 
 
+def _ensure_signoff_on_new_line(text: str, signoff: str) -> str:
+    """Guarantee the sign-off sits on its own line, with a blank line before it.
+
+    The model sometimes trails the sign-off straight after the last sentence
+    ("...works. — Prashant..."). Split it back onto its own line so the UI
+    renders it as a separate line."""
+    text = text.strip()
+    # If the exact sign-off is already present, split the body before it.
+    idx = text.find(signoff)
+    if idx != -1:
+        body = text[:idx].rstrip()
+        return f"{body}\n\n{signoff}"
+    # Otherwise, split on the sign-off's dash marker if the model used one.
+    dash = signoff.split(",")[0]  # e.g. "— Prashant Farakate"
+    idx = text.find(dash)
+    if idx != -1:
+        body = text[:idx].rstrip()
+        return f"{body}\n\n{signoff}"
+    # No sign-off found at all — append ours.
+    return f"{text}\n\n{signoff}"
+
+
 def draft_followup(lead: dict, scheme_context: str, slot: str, sender_name: str | None = None) -> dict:
     """Draft a follow-up message that is 'from' the signed-in sales executive.
 
@@ -114,10 +136,15 @@ in plain conversational English.
 
 The message is sent BY the sales executive named "{sender}". This is the sender's
 real name — use it as the sender and nothing else. Do NOT invent or substitute any
-other sales-rep name. Sign off with exactly "{signoff}".
+other sales-rep name.
 
 Mention the test-drive slot and, if relevant, the finance scheme context below.
 Keep it under 60 words. Do not invent facts not given here.
+
+End the message with the sign-off on its OWN separate line, preceded by a blank
+line, exactly like this (keep the line break):
+
+{signoff}
 
 Lead: {json.dumps(lead)}
 Test-drive slot held: {slot}
@@ -127,6 +154,7 @@ Respond with ONLY the message text, nothing else."""
         try:
             text = _invoke(llm, prompt).strip()
             if text:
+                text = _ensure_signoff_on_new_line(text, signoff)
                 return {"message": text, "mode": "llm"}
         except Exception:
             pass  # fall through to heuristic

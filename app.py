@@ -606,8 +606,11 @@ elif page == "Lead Pipeline":
                                 st.rerun()
                     else:
                         # ---- view mode ----
+                        # Render newlines as <br> so the sign-off shows on its own line
+                        # (HTML collapses raw newlines inside a div to whitespace).
+                        _draft_html = st.session_state[draft_key].replace("\n", "<br>")
                         st.markdown(
-                            f'<div class="draft">{st.session_state[draft_key]}</div>',
+                            f'<div class="draft">{_draft_html}</div>',
                             unsafe_allow_html=True,
                         )
                         st.caption(f"Drafted via: {draft['mode']}")
