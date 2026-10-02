@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72" role="img" aria-label="SalesSaathi logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e6fff"/>
+      <stop offset="1" stop-color="#00c2a8"/>
+    </linearGradient>
+  </defs>
+  <!-- badge -->
+  <rect x="4" y="12" width="48" height="48" rx="12" fill="url(#g)"/>
+  <!-- simple car glyph -->
+  <g fill="#ffffff">
+    <path d="M15 40c0-1.5 1-2.6 2.3-3l2.6-6.2c.4-1 1.4-1.7 2.5-1.7h11.2c1.1 0 2.1.7 2.5 1.7L41 37c1.3.4 2.3 1.5 2.3 3v4.2c0 .8-.6 1.4-1.4 1.4h-1.6c-.8 0-1.4-.6-1.4-1.4V44H19.5v.2c0 .8-.6 1.4-1.4 1.4h-1.6c-.8 0-1.5-.6-1.5-1.4V40z"/>
+    <circle cx="21" cy="43.5" r="2.4" fill="#1e6fff"/>
+    <circle cx="35" cy="43.5" r="2.4" fill="#1e6fff"/>
+  </g>
+  <!-- wordmark -->
+  <text x="64" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#e8eefc">Sales<tspan fill="#00c2a8">Saathi</tspan></text>
+  <text x="65" y="56" font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#8fa1c4">AI co-pilot for sales</text>
+</svg>

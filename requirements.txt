@@ -1,0 +1,9 @@
+mcp<2
+anthropic
+langchain-groq
+chromadb
+pypdf
+streamlit
+truststore
+rich
+python-dotenv
