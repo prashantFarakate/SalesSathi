@@ -185,7 +185,7 @@ def _load_leads() -> list[dict]:
         return []
 
 
-def _run_agent_pipeline(lead_id: str) -> tuple[list[tuple[str, dict]], dict | None]:
+def _run_agent_pipeline(lead_id: str, sender_name: str) -> tuple[list[tuple[str, dict]], dict | None]:
     """Run the async agent pipeline from Streamlit safely.
 
     run_pipeline() is async and launches the MCP server as a subprocess over
@@ -206,7 +206,7 @@ def _run_agent_pipeline(lead_id: str) -> tuple[list[tuple[str, dict]], dict | No
         asyncio.set_event_loop(loop)
         try:
             result_box["result"] = loop.run_until_complete(
-                run_pipeline(lead_id, on_step=_collect)
+                run_pipeline(lead_id, on_step=_collect, sender_name=sender_name)
             )
         except Exception as exc:  # noqa: BLE001 - surface, never crash the demo
             error_box["error"] = str(exc)
@@ -495,7 +495,7 @@ elif page == "Lead Pipeline":
             with c[5]:
                 if st.button("Run agent →", key=f"run::{lead['id']}", use_container_width=True):
                     with st.spinner("Running the agent over the MCP tool layer..."):
-                        steps, result = _run_agent_pipeline(lead["id"])
+                        steps, result = _run_agent_pipeline(lead["id"], USER_NAME)
                     st.session_state.agent_steps = steps
                     st.session_state.agent_result = result
                     st.session_state.agent_lead_id = lead["id"]

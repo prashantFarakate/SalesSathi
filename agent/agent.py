@@ -42,9 +42,13 @@ def _tool_result_to_obj(result):
     return None
 
 
-async def run_pipeline(lead_id: str, on_step=print):
+async def run_pipeline(lead_id: str, on_step=print, sender_name: str | None = None):
     """Runs the full pipeline for one lead. `on_step(step_name, detail)` is
-    called after each step so a CLI or UI can render progress live."""
+    called after each step so a CLI or UI can render progress live.
+
+    `sender_name` is the signed-in sales executive; the drafted follow-up is
+    written as being from them, so the message identity matches the logged-in
+    user instead of a hardcoded name."""
     server_params = StdioServerParameters(command=sys.executable, args=[SERVER_SCRIPT])
 
     async with stdio_client(server_params) as (read, write):
@@ -90,7 +94,10 @@ async def run_pipeline(lead_id: str, on_step=print):
             on_step("schedule_test_drive", slot_info)
 
             # Step 6: draft
-            draft_info = draft_followup(lead, scheme_context, slot_info.get("slot", "an upcoming slot"))
+            draft_info = draft_followup(
+                lead, scheme_context, slot_info.get("slot", "an upcoming slot"),
+                sender_name=sender_name,
+            )
             on_step("draft_followup", draft_info)
 
             return {

@@ -18,8 +18,11 @@ import os
 # Groq model, shared with the RAG answerer. Overridable via env.
 MODEL_ID = os.getenv("SALESSAATHI_MODEL", "openai/gpt-oss-120b")
 
-SALES_EXEC_NAME = "Prashant"
-SALES_EXEC_SIGNOFF = "— Prashant, Tata Motors Pune Central"
+# Fallback sender used only if the caller doesn't pass one. In the app the
+# signed-in user's name is passed down, so the draft is always "from" whoever
+# is logged in — there is no second hardcoded identity.
+DEFAULT_SENDER = "the Tata Motors sales team"
+DEALERSHIP = "Tata Motors Pune Central"
 
 
 def _get_llm():
@@ -94,15 +97,27 @@ def _heuristic_score(lead: dict, in_stock: bool) -> dict:
     return {"score": score, "tier": tier, "reasons": reasons}
 
 
-def draft_followup(lead: dict, scheme_context: str, slot: str) -> dict:
-    """Returns {"message": str, "mode": "llm"|"heuristic"}"""
+def draft_followup(lead: dict, scheme_context: str, slot: str, sender_name: str | None = None) -> dict:
+    """Draft a follow-up message that is 'from' the signed-in sales executive.
+
+    `sender_name` is the logged-in user's name, passed down from the UI so the
+    draft's identity always matches whoever is using the app. Returns
+    {"message": str, "mode": "llm"|"heuristic"}.
+    """
+    sender = (sender_name or "").strip() or DEFAULT_SENDER
+    signoff = f"— {sender}, {DEALERSHIP}"
+
     llm = _get_llm()
     if llm:
-        prompt = f"""Write a short, warm WhatsApp follow-up message from a Tata Motors
-sales executive named {SALES_EXEC_NAME} to a lead, in plain conversational English.
+        prompt = f"""Write a short, warm WhatsApp follow-up message to a car-dealership lead,
+in plain conversational English.
+
+The message is sent BY the sales executive named "{sender}". This is the sender's
+real name — use it as the sender and nothing else. Do NOT invent or substitute any
+other sales-rep name. Sign off with exactly "{signoff}".
+
 Mention the test-drive slot and, if relevant, the finance scheme context below.
 Keep it under 60 words. Do not invent facts not given here.
-Sign off as "{SALES_EXEC_SIGNOFF}".
 
 Lead: {json.dumps(lead)}
 Test-drive slot held: {slot}
@@ -116,10 +131,10 @@ Respond with ONLY the message text, nothing else."""
         except Exception:
             pass  # fall through to heuristic
 
-    return {"message": _heuristic_draft(lead, scheme_context, slot), "mode": "heuristic"}
+    return {"message": _heuristic_draft(lead, scheme_context, slot, signoff), "mode": "heuristic"}
 
 
-def _heuristic_draft(lead: dict, scheme_context: str, slot: str) -> str:
+def _heuristic_draft(lead: dict, scheme_context: str, slot: str, signoff: str) -> str:
     first_name = lead["name"].split(" ")[0]
     scheme_line = (
         f" Also, {scheme_context}" if scheme_context else " Let me know your budget and I'll share the best current offer."
@@ -127,5 +142,5 @@ def _heuristic_draft(lead: dict, scheme_context: str, slot: str) -> str:
     return (
         f"Hi {first_name}, thanks for your interest in the {lead['model']}! "
         f"I've held a test drive slot for {slot}, just confirm if that works."
-        f"{scheme_line}\n\n{SALES_EXEC_SIGNOFF}"
+        f"{scheme_line}\n\n{signoff}"
     )
