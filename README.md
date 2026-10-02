@@ -1,5 +1,7 @@
 # 🚗 SalesSaathi
 
+**Live demo: https://tatamotors-salesathi.streamlit.app/**
+
 An AI co-pilot for **Tata Motors dealer sales executives** — built to demonstrate
 hands-on AI product skills (RAG, agentic pipelines, MCP), not just talk about them.
 
@@ -129,6 +131,8 @@ RAG, not the model guessing.
 ---
 
 ## Deploy (share a live link with an interviewer)
+
+> **Live instance:** https://tatamotors-salesathi.streamlit.app/
 
 **Streamlit Community Cloud** (free, purpose-built for this):
 
