@@ -244,7 +244,7 @@ def _kb_add_dialog():
         label_visibility="collapsed",
     )
     st.info(
-        "Prototype note: ingestion is disabled in this demo — files aren't actually "
+        "Prototype note: ingestion is disabled in this demo, so files aren't actually "
         "added. In production this writes to the document store and rebuilds the index."
     )
     if st.button("Add to knowledge base", type="primary", use_container_width=True):
@@ -290,7 +290,7 @@ def _queue(question: str) -> None:
 
 with st.sidebar:
     st.markdown('<div class="brand">SalesSaathi</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-sub">AI co-pilot prototype — sales &amp; marketing</div>',
+    st.markdown('<div class="brand-sub">AI co-pilot prototype for sales &amp; marketing</div>',
                 unsafe_allow_html=True)
     st.write("")
     page = st.radio(
@@ -332,7 +332,7 @@ st.markdown(
     f"""
     <div class="topbar">
       <div class="who">Signed in as <b>{USER_NAME}</b> · {USER_ROLE} · {USER_SITE}</div>
-      <div class="pill">Pilot — Prototype</div>
+      <div class="pill">Pilot Prototype</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -351,7 +351,7 @@ if page == "Knowledge Assistant":
                 unsafe_allow_html=True)
     st.markdown(
         '<div class="page-sub">Retrieval-grounded answers over brochures, spec sheets and '
-        "finance schemes — every answer cites its source, and the assistant says so when it "
+        "finance schemes. Every answer cites its source, and the assistant admits when it "
         "doesn't know rather than guessing.</div>",
         unsafe_allow_html=True,
     )
@@ -382,7 +382,7 @@ if page == "Knowledge Assistant":
 
     with right:
         st.caption(
-            "Ask a comparison, spec, or finance question below — try one of the prompts, "
+            "Ask a comparison, spec, or finance question below. Try one of the prompts "
             "or write your own."
         )
 
@@ -439,7 +439,7 @@ if page == "Knowledge Assistant":
 
                     st.markdown(text)
                     if mode == "no_context":
-                        st.info("No confident match in the knowledge base — the assistant declined to guess.")
+                        st.info("No confident match in the knowledge base, so the assistant declined to guess.")
                     if sources:
                         st.caption("Sources: " + ", ".join(sources))
                     if chunks:
@@ -516,7 +516,7 @@ elif page == "Lead Pipeline":
 
             st.write("")
             with st.container(border=True):
-                st.markdown(f"### Agent run — {run_id}")
+                st.markdown(f"### Agent run · {run_id}")
 
                 if "error" in step_map:
                     st.error(f"Pipeline error: {step_map['error'].get('message', 'unknown error')}")
@@ -529,7 +529,7 @@ elif page == "Lead Pipeline":
                     draft = result["draft"]
 
                     inv_txt = ("in stock at nearest dealership" if inv.get("inStock")
-                               else "not in stock — flag for allocation")
+                               else "not in stock, flag for allocation")
 
                     progressive = [
                         ("Fetch lead from CRM",
@@ -538,7 +538,7 @@ elif page == "Lead Pipeline":
                         ("Score lead",
                          f"score {score['score']}/100 · <span class='hot'>{score['tier'].upper()}</span>"),
                         ("Hold test-drive slot", f"slot held: {slot.get('slot', 'n/a')}"),
-                        ("Draft follow-up message", "draft ready — awaiting human approval"),
+                        ("Draft follow-up message", "draft ready, awaiting human approval"),
                     ]
 
                     animate = st.session_state.get("agent_animate", False)
@@ -616,7 +616,7 @@ elif page == "Lead Pipeline":
                         st.caption(f"Drafted via: {draft['mode']}")
 
                         if st.session_state.get(sent_flag):
-                            st.success("Approved — queued to send via WhatsApp (demo: not actually sent).")
+                            st.success("Approved and queued to send via WhatsApp (demo: not actually sent).")
 
                         b1, b2, _ = st.columns([1, 1, 4])
                         with b1:
@@ -636,7 +636,7 @@ elif page == "Lead Pipeline":
 elif page == "Integration Log":
     st.markdown('<div class="page-title">MCP Tool Layer</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="page-sub">Standardized tool contracts the agent calls — instead of a '
+        '<div class="page-sub">Standardized tool contracts the agent calls, instead of a '
         "bespoke integration for every new AI feature.</div>",
         unsafe_allow_html=True,
     )
@@ -645,7 +645,7 @@ elif page == "Integration Log":
         "In production, **get_lead_from_crm**, **check_inventory** and **schedule_test_drive** "
         "would be served by an MCP server connected to Salesforce Sales Cloud, the Dealer "
         "Management System, and the showroom calendar. Below is a live log of tool calls made "
-        "by the agent during this session — run a lead in the Pipeline tab to populate it."
+        "by the agent during this session. Run a lead in the Pipeline tab to populate it."
     )
 
     steps = st.session_state.agent_steps

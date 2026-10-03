@@ -98,24 +98,22 @@ def _heuristic_score(lead: dict, in_stock: bool) -> dict:
 
 
 def _ensure_signoff_on_new_line(text: str, signoff: str) -> str:
-    """Guarantee the sign-off sits on its own line, with a blank line before it.
+    """Guarantee the sign-off sits on its own block, with a blank line before it.
 
-    The model sometimes trails the sign-off straight after the last sentence
-    ("...works. — Prashant..."). Split it back onto its own line so the UI
-    renders it as a separate line."""
+    The model sometimes trails the sender name straight after the last sentence.
+    Split it back out so the UI renders the sign-off as its own lines."""
     text = text.strip()
-    # If the exact sign-off is already present, split the body before it.
-    idx = text.find(signoff)
+    sender_line = signoff.split("\n")[0].strip()  # e.g. "Prashant Farakate"
+
+    # If the full sign-off is already present, normalize the spacing before it.
+    idx = text.find(sender_line)
     if idx != -1:
-        body = text[:idx].rstrip()
+        body = text[:idx].rstrip().rstrip(",").rstrip()
+        # Drop a trailing dash the model may have added before the name.
+        body = body.rstrip("-—–").rstrip()
         return f"{body}\n\n{signoff}"
-    # Otherwise, split on the sign-off's dash marker if the model used one.
-    dash = signoff.split(",")[0]  # e.g. "— Prashant Farakate"
-    idx = text.find(dash)
-    if idx != -1:
-        body = text[:idx].rstrip()
-        return f"{body}\n\n{signoff}"
-    # No sign-off found at all — append ours.
+
+    # No sign-off found at all; append ours.
     return f"{text}\n\n{signoff}"
 
 
@@ -127,7 +125,7 @@ def draft_followup(lead: dict, scheme_context: str, slot: str, sender_name: str 
     {"message": str, "mode": "llm"|"heuristic"}.
     """
     sender = (sender_name or "").strip() or DEFAULT_SENDER
-    signoff = f"— {sender}, {DEALERSHIP}"
+    signoff = f"{sender}\n{DEALERSHIP}"
 
     llm = _get_llm()
     if llm:
@@ -135,7 +133,7 @@ def draft_followup(lead: dict, scheme_context: str, slot: str, sender_name: str 
 in plain conversational English.
 
 The message is sent BY the sales executive named "{sender}". This is the sender's
-real name — use it as the sender and nothing else. Do NOT invent or substitute any
+real name, so use it as the sender and nothing else. Do NOT invent or substitute any
 other sales-rep name.
 
 Mention the test-drive slot and, if relevant, the finance scheme context below.
