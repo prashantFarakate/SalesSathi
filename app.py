@@ -356,29 +356,35 @@ if page == "Knowledge Assistant":
         unsafe_allow_html=True,
     )
 
-    left, right = st.columns([1, 2], gap="large")
+    # Let the user collapse the Knowledge Base panel to give the chat full width.
+    show_kb = st.toggle("Show knowledge base", value=True, key="show_kb")
 
-    with left:
-        kb_rows = "".join(
-            f'<div class="kb-row"><span class="kb-name">{name}</span>'
-            f'<span class="kb-date">{date}</span></div>'
-            for name, date in KB_DOCS
-        )
-        st.markdown(
-            f'<div class="panel"><div class="panel-h">KNOWLEDGE BASE</div>{kb_rows}</div>',
-            unsafe_allow_html=True,
-        )
-        st.write("")
-        ba, bs = st.columns(2)
-        with ba:
-            add_clicked = st.button("＋ Add documents", use_container_width=True)
-        with bs:
-            search_clicked = st.button("🔍 Search", use_container_width=True)
+    if show_kb:
+        left, right = st.columns([1, 2], gap="large")
+        with left:
+            kb_rows = "".join(
+                f'<div class="kb-row"><span class="kb-name">{name}</span>'
+                f'<span class="kb-date">{date}</span></div>'
+                for name, date in KB_DOCS
+            )
+            st.markdown(
+                f'<div class="panel"><div class="panel-h">KNOWLEDGE BASE</div>{kb_rows}</div>',
+                unsafe_allow_html=True,
+            )
+            st.write("")
+            ba, bs = st.columns(2)
+            with ba:
+                add_clicked = st.button("＋ Add documents", use_container_width=True)
+            with bs:
+                search_clicked = st.button("🔍 Search", use_container_width=True)
 
-        if add_clicked:
-            _kb_add_dialog()
-        if search_clicked:
-            _kb_search_dialog()
+            if add_clicked:
+                _kb_add_dialog()
+            if search_clicked:
+                _kb_search_dialog()
+    else:
+        # KB hidden: chat uses the full width.
+        right = st.container()
 
     with right:
         st.caption(
