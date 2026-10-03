@@ -278,10 +278,15 @@ if "agent_result" not in st.session_state:
     st.session_state.agent_result = None
 if "agent_lead_id" not in st.session_state:
     st.session_state.agent_lead_id = None
+if "kb_collapsed" not in st.session_state:
+    st.session_state.kb_collapsed = False
 
 
 def _queue(question: str) -> None:
     st.session_state.pending = question
+    # Auto-collapse the knowledge base once the user starts chatting, so the
+    # conversation gets full width. They can toggle it back on anytime.
+    st.session_state.kb_collapsed = True
 
 
 # --------------------------------------------------------------------------- #
@@ -357,7 +362,16 @@ if page == "Knowledge Assistant":
     )
 
     # Let the user collapse the Knowledge Base panel to give the chat full width.
-    show_kb = st.toggle("Show knowledge base", value=True, key="show_kb")
+    # It also auto-collapses the first time the user sends a message (see _queue).
+    def _sync_kb_toggle():
+        st.session_state.kb_collapsed = not st.session_state.kb_toggle
+
+    # Keep the toggle widget in sync with kb_collapsed (which _queue may have just
+    # flipped), then render it. Writing the widget key before instantiation is the
+    # safe way to force its displayed state.
+    st.session_state.kb_toggle = not st.session_state.kb_collapsed
+    st.toggle("Show knowledge base", key="kb_toggle", on_change=_sync_kb_toggle)
+    show_kb = not st.session_state.kb_collapsed
 
     if show_kb:
         left, right = st.columns([1, 2], gap="large")
